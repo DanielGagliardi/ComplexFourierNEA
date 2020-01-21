@@ -1,4 +1,6 @@
-console.log(points);
+window.onload = function() {
+  console.log(points);
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
