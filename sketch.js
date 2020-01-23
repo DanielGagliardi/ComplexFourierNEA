@@ -1,9 +1,15 @@
-window.onload = function() {
+var fourierSeries;
+var numberOfTerms;
+var indexes;
+var t = 0;
+var xOffset;
+var yOffset;
 
+function setup() {
   class Complex {
     constructor(realPart, imaginaryPart) {
-        this.re = realPart;
-        this.im = imaginaryPart;
+      this.re = realPart;
+      this.im = imaginaryPart;
     }
   }
 
@@ -18,8 +24,8 @@ window.onload = function() {
     var result = new Complex(z.re * w.re - z.im * w.im, z.re * w.im + z.im * w.re);
     return result
   }
-  //testing complex functions
-  /*
+  /*testing complex functions
+
   var z = new Complex(1,1);
   var w = new Complex(2,2);
   console.log(Complex_Multiply(z,w).re, Complex_Multiply(z,w).im);
@@ -33,9 +39,9 @@ window.onload = function() {
     } else {
       var odd = numberOfTerms % 2;
       var indexes = [0];
-      for (index = 1; index <= numberOfTerms / 2  ; index++) {
+      for (index = 1; index <= numberOfTerms / 2; index++) {
         indexes.push(index);
-        indexes.push(-1*index);
+        indexes.push(-1 * index);
       }
       if (odd === 0) {
         indexes.pop();
@@ -47,55 +53,86 @@ window.onload = function() {
   function Fourier_Coefficient(path, index) {
     //declaring variables 
     var n = index;
-    var N = path.length();
-    var coefficient = new Complex(0,0);
+    var N = path.length;
+    var coefficient = new Complex(0, 0);
     //summation
     for (k = 1; k <= N; k++) {
-      var x = path[k-1][0];
-      var y = path[k-1][1];
-      var term1 = new Complex(x,y);
-      var term2 = new Complex(cos(-n*2*PI*k/N), sin(-n*2*PI*k/N));
+      var x = path[k - 1][0];
+      var y = path[k - 1][1];
+      var term1 = new Complex(x, y);
+      var term2 = new Complex(cos(-n * 2 * PI * k / N), sin(-n * 2 * PI * k / N));
       var insert = Complex_Multiply(term1, term2);
-      var coefficient = Complex_Add(coefficient,insert); 
+      var coefficient = Complex_Add(coefficient, insert);
     }
     //dividing by N
     var finalCoefficient = new Complex(coefficient.re / N, coefficient.im / N);
     return finalCoefficient;
   }
   //console.log(Fourier_Coefficient(points,0));
-  
   function FourierSeries_Gen(path, numberOfTerms) {
-    var numberOfPoints = path.length();
+    var numberOfPoints = path.length;
     var indexes = Index_Gen(numberOfTerms);
     //Fourier series is an array of complex coefficients that match the order of the indexes eg. [C0,C1,C-1,C2,C-2,…]
-    var fourierSeries=[];
-    for (i = 0; i <= numberOfTerms; i++) {
-	    var index = indexes[i];
-      fourierSeries.push(Fourier_Coefficient(index));
+    var fourierSeries = [];
+    for (i = 0; i <= numberOfTerms - 1; i++) {
+      var index = indexes[i];
+      fourierSeries.push(Fourier_Coefficient(path, index));
     }
     return fourierSeries
   }
-  console.log(FourierSeries_Gen(points, 0));
-  
-}
 
-
-
-function setup() {
   createCanvas(windowWidth, windowHeight);
   background("black");
-
   beginShape();
   noFill();
   stroke(255);
   strokeWeight(3);
-  for (i=0; i<points.length; i++) {
-    var xOffset = 600;
-    var yOffset = 200; 
+  for (i = 0; i < points.length; i++) {
+    xOffset = 600;
+    yOffset = 200;
     vertex(points[i][0] + xOffset, points[i][1] + yOffset);
   }
   endShape(CLOSE);
+
+  //pre animation set up
+  numberOfTerms = 50;
+  fourierSeries = FourierSeries_Gen(points, numberOfTerms);
+  indexes = Index_Gen(numberOfTerms);
 }
 
 function draw() {
+  var x = 0
+  var y = 0
+
+  console.log(fourierSeries);
+
+  translate(xOffset, yOffset);
+  for (i = 0; i < numberOfTerms; i++) {
+
+    console.log(i);
+
+    var oldx = x;
+    var oldy = y;
+    var Ci = fourierSeries[i];
+    radius = sqrt(Ci.re * Ci.re + Ci.im * Ci.im);
+    initialAngle = atan2(Ci.im, Ci.re);
+    frequency = indexes[i];
+    x += radius * cos(frequency * t + initialAngle);
+    y += radius * sin(frequency * t + initialAngle);
+    
+    console.log("x", x, "y", y , "oldx", oldx, "oldy", oldy, "radius", radius, "Ci", Ci, "initalAngle", initialAngle, "frequency", frequency);
+
+    noFill();
+    strokeWeight(1);
+    stroke(255);
+    circle(oldx, oldy, radius * 2);
+
+
+    strokeWeight(1);
+    stroke(255);
+    line(oldx, oldy, x, y);
+
+  }
+  t += 0.002
 }
+
