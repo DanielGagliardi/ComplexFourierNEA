@@ -83,6 +83,19 @@ function setup() {
 
   createCanvas(windowWidth, windowHeight);
   background("black");
+
+
+  //pre animation set up
+  numberOfTerms = 250;
+  fourierSeries = FourierSeries_Gen(points, numberOfTerms);
+  indexes = Index_Gen(numberOfTerms);
+}
+
+function draw() {
+  background(0);
+  var x = 0
+  var y = 0
+
   beginShape();
   noFill();
   stroke(255);
@@ -93,16 +106,6 @@ function setup() {
     vertex(points[i][0] + xOffset, points[i][1] + yOffset);
   }
   endShape(CLOSE);
-
-  //pre animation set up
-  numberOfTerms = 50;
-  fourierSeries = FourierSeries_Gen(points, numberOfTerms);
-  indexes = Index_Gen(numberOfTerms);
-}
-
-function draw() {
-  var x = 0
-  var y = 0
 
   console.log(fourierSeries);
 
@@ -133,6 +136,6 @@ function draw() {
     line(oldx, oldy, x, y);
 
   }
-  t += 0.002
+  t += 0.01
 }
 
