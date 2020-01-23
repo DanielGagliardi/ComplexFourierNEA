@@ -4,6 +4,8 @@ var indexes;
 var t = 0;
 var xOffset;
 var yOffset;
+var drawnLine = [];
+var timeIncrement = 0.01;
 
 function setup() {
   class Complex {
@@ -84,19 +86,15 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   background("black");
 
-
   //pre animation set up
-  numberOfTerms = 250;
+  numberOfTerms = 100;
   fourierSeries = FourierSeries_Gen(points, numberOfTerms);
   indexes = Index_Gen(numberOfTerms);
 }
 
 function draw() {
-  background(0);
-  var x = 0
-  var y = 0
-
-  beginShape();
+  background("black");
+  /*  beginShape();
   noFill();
   stroke(255);
   strokeWeight(3);
@@ -105,10 +103,10 @@ function draw() {
     yOffset = 200;
     vertex(points[i][0] + xOffset, points[i][1] + yOffset);
   }
-  endShape(CLOSE);
-
-  console.log(fourierSeries);
-
+  endShape(CLOSE);  */
+  var x = 0;
+  var y = 0;
+  //console.log(fourierSeries);
   translate(xOffset, yOffset);
   for (i = 0; i < numberOfTerms; i++) {
 
@@ -123,19 +121,28 @@ function draw() {
     x += radius * cos(frequency * t + initialAngle);
     y += radius * sin(frequency * t + initialAngle);
     
-    console.log("x", x, "y", y , "oldx", oldx, "oldy", oldy, "radius", radius, "Ci", Ci, "initalAngle", initialAngle, "frequency", frequency);
-
+    //console.log("x", x, "y", y , "oldx", oldx, "oldy", oldy, "radius", radius, "Ci", Ci, "initalAngle", initialAngle, "frequency", frequency);
     noFill();
     strokeWeight(1);
     stroke(255);
     circle(oldx, oldy, radius * 2);
-
 
     strokeWeight(1);
     stroke(255);
     line(oldx, oldy, x, y);
 
   }
-  t += 0.01
+  drawnLine.push([x,y]);
+
+  noFill();
+  beginShape();
+  for (var i = 0; i < drawnLine.length; i++) {
+    stroke(255,255,0);
+    strokeWeight(1);
+    vertex(drawnLine[i][0], drawnLine[i][1]);
+  }
+  endShape();
+
+  t += timeIncrement;
 }
 
