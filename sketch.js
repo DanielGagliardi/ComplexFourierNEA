@@ -17,11 +17,13 @@ req.onload = function () {
 	var parser = new DOMParser();
 	var svg = parser.parseFromString(text,"text/xml");
 	var path = svg.getElementsByTagName("path")[0].getAttribute("d");
-
 	alert(path);
+	alert(Snap.path.getTotalLength(path));
 };
+
 req.open('GET', './resources/sigma.svg');
 req.send();
+
 
 
 
