@@ -1,31 +1,14 @@
 var fourierSeries;
-var numberOfTerms;
+var numberOfTerms = 200;
 var indexes;
 var t = 0;
 var xOffset;
 var yOffset;
 var drawnLine = [];
 var timeIncrement = 0.001;
-var shapes = [pi_points, sigma_points];
-var points = shapes[0];
-
-
-var req = new XMLHttpRequest();
-req.onload = function () {
-	var text = this.responseText;
-	
-	var parser = new DOMParser();
-	var svg = parser.parseFromString(text,"text/xml");
-	var path = svg.getElementsByTagName("path")[0].getAttribute("d");
-	alert(path);
-	alert(Snap.path.getTotalLength(path));
-};
-
-req.open('GET', './resources/sigma.svg');
-req.send();
-
-
-
+var points = [];
+var totalLength;
+var pathString;
 
 function setup() {
 	class Complex {
@@ -46,12 +29,6 @@ function setup() {
 		var result = new Complex(z.re * w.re - z.im * w.im, z.re * w.im + z.im * w.re);
 		return result
 	}
-	/*testing complex functions
-
-	var z = new Complex(1,1);
-	var w = new Complex(2,2);
-	console.log(Complex_Multiply(z,w).re, Complex_Multiply(z,w).im);
-	*/
 
 	function Index_Gen(numberOfTerms) {
 		if (numberOfTerms === 0) {
@@ -90,7 +67,7 @@ function setup() {
 		var finalCoefficient = new Complex(coefficient.re / N, coefficient.im / N);
 		return finalCoefficient;
 	}
-	//console.log(Fourier_Coefficient(points,0));
+
 	function FourierSeries_Gen(path, numberOfTerms) {
 		var numberOfPoints = path.length;
 		var indexes = Index_Gen(numberOfTerms);
@@ -103,38 +80,39 @@ function setup() {
 		return fourierSeries
 	}
 
+	var req = new XMLHttpRequest();
+	req.onload = function () {
+		var text = this.responseText;
+		var parser = new DOMParser();
+		var svg = parser.parseFromString(text, "text/xml");
+		pathString = svg.getElementsByTagName("path")[0].getAttribute("d");
+		console.log(pathString);
+		for (i = 0; i <= Snap.path.getTotalLength(pathString); i++) {
+			var point = Snap.path.getPointAtLength(pathString, i);
+			points.push([point.x, point.y]);
+		}
+		console.log(points);
+		fourierSeries = FourierSeries_Gen(points, numberOfTerms);
+	}	
+	req.open('GET', './resources/pi.svg');
+	req.send();
+
+	indexes = Index_Gen(numberOfTerms);
+
 	createCanvas(windowWidth, windowHeight);
 	background("black");
-
-
-
-	//pre animation set up
-	numberOfTerms = 300;
-	fourierSeries = FourierSeries_Gen(points, numberOfTerms);
-	indexes = Index_Gen(numberOfTerms);
-	//frameRate(30);
 }
 
 function draw() {
 	background("black");
-	/*	beginShape();
-	noFill();
-	stroke(255);
-	strokeWeight(3);
-	for (i = 0; i < points.length; i++) {
-		xOffset = 600;
-		yOffset = 200;
-		vertex(points[i][0] + xOffset, points[i][1] + yOffset);
-	}
-	endShape(CLOSE);*/
-	 x = 0;
+
+	var x = 0;
 	var y = 0;
-	//console.log(fourierSeries);
 	xOffset = 600;
 	yOffset = 300;
 	translate(xOffset, yOffset);
+
 	for (i = 0; i < numberOfTerms; i++) {
-		//console.log(i);
 		var oldx = x;
 		var oldy = y;
 		var Ci = fourierSeries[i];
@@ -144,7 +122,6 @@ function draw() {
 		x += radius * cos(frequency * t * TWO_PI + initialAngle);
 		y += radius * sin(frequency * t * TWO_PI + initialAngle);
 
-		//console.log("x", x, "y", y , "oldx", oldx, "oldy", oldy, "radius", radius, "Ci", Ci, "initalAngle", initialAngle, "frequency", frequency);
 		noFill();
 		strokeWeight(1);
 		stroke(255, 255, 255, 100);
@@ -159,19 +136,21 @@ function draw() {
 
 	noFill();
 	beginShape();
+	stroke(0, 255, 0);
+	strokeWeight(1);
+	for (var i = 0; i < points.length; i++) {
+		vertex(points[i][0], points[i][1]);
+	}
+	endShape();
+
+	noFill();
+	beginShape();
+	stroke(255, 0, 128);
+	strokeWeight(2);
 	for (var i = 0; i < drawnLine.length; i++) {
-		stroke(255, 255, 0);
-		strokeWeight(1);
 		vertex(drawnLine[i][0], drawnLine[i][1]);
 	}
 	endShape();
 
 	t += timeIncrement;
 }
-
-
-/*
-var parser = new DOMParser();
-var svg = parser.parseFromString(text,"text/xml");
-var path = svg.getElementsByTagName("path")[0].getAttribute("d");
-*/
