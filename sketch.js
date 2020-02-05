@@ -1,14 +1,14 @@
 var fourierSeries;
-var numberOfTerms = 200;
+var numberOfTerms = 1000;
 var indexes;
 var t = 0;
-var xOffset;
-var yOffset;
 var drawnLine = [];
 var timeIncrement = 0.001;
 var points = [];
 var totalLength;
 var pathString;
+var maxShapeHeight = 800;
+var maxShapeWidth = 1000;
 
 function setup() {
 	class Complex {
@@ -86,36 +86,51 @@ function setup() {
 		var parser = new DOMParser();
 		var svg = parser.parseFromString(text, "text/xml");
 		pathString = svg.getElementsByTagName("path")[0].getAttribute("d");
-		console.log(pathString);
+		var initialXPoints = [];
+		var initialYPoints = [];
 		for (i = 0; i <= Snap.path.getTotalLength(pathString); i++) {
 			var point = Snap.path.getPointAtLength(pathString, i);
-			points.push([point.x, point.y]);
+			initialXPoints.push(point.x);
+			initialYPoints.push(point.y);
 		}
-		console.log(points);
+		var maxX = Math.max.apply(null, initialXPoints);
+		var maxY = Math.max.apply(null, initialYPoints);
+		var minX = Math.min.apply(null, initialXPoints);
+		var minY = Math.min.apply(null, initialYPoints);
+
+		var xOffset = (maxX - minX)/2 + minX;
+		var yOffset = (maxY - minY)/2 + minY;
+
+		xEnlargement = maxShapeWidth/(maxX - minX);
+		yEnlargement = maxShapeHeight/(maxY - minY);
+		if (xEnlargement < yEnlargement) {
+			enlargementFactor = xEnlargement;
+		} else {
+			enlargementFactor = yEnlargement;
+		}
+		for (i = 0; i < initialXPoints.length; i++) {
+			points.push([ enlargementFactor * (initialXPoints[i] - xOffset), enlargementFactor * (initialYPoints[i] - yOffset) ]);
+		}
+
 		fourierSeries = FourierSeries_Gen(points, numberOfTerms);
-	}	
-	req.open('GET', './resources/pi.svg');
+	}
+	req.open('GET', './resources/adarsh.svg', false);
 	req.send();
-
 	indexes = Index_Gen(numberOfTerms);
-
 	createCanvas(windowWidth, windowHeight);
 	background("black");
 }
 
 function draw() {
 	background("black");
-
 	var x = 0;
 	var y = 0;
-	xOffset = 600;
-	yOffset = 300;
-	translate(xOffset, yOffset);
-
+	translate(windowWidth/2, windowHeight/2);
 	for (i = 0; i < numberOfTerms; i++) {
 		var oldx = x;
 		var oldy = y;
 		var Ci = fourierSeries[i];
+
 		radius = sqrt(Ci.re * Ci.re + Ci.im * Ci.im);
 		initialAngle = atan2(Ci.im, Ci.re);
 		frequency = indexes[i];
@@ -124,16 +139,16 @@ function draw() {
 
 		noFill();
 		strokeWeight(1);
-		stroke(255, 255, 255, 100);
+		stroke(255,255,255,100);
 		circle(oldx, oldy, radius * 2);
 
 		strokeWeight(1);
-		stroke(255, 255, 255, 100);
+		stroke(255,255,255,100);
 		line(oldx, oldy, x, y);
 	}
 
 	drawnLine.push([x, y]);
-
+	/*
 	noFill();
 	beginShape();
 	stroke(0, 255, 0);
@@ -142,10 +157,10 @@ function draw() {
 		vertex(points[i][0], points[i][1]);
 	}
 	endShape();
-
+*/
 	noFill();
 	beginShape();
-	stroke(255, 0, 128);
+	stroke(0, 255, 128);
 	strokeWeight(2);
 	for (var i = 0; i < drawnLine.length; i++) {
 		vertex(drawnLine[i][0], drawnLine[i][1]);
