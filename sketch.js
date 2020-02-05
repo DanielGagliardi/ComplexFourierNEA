@@ -7,8 +7,8 @@ var timeIncrement = 0.001;
 var points = [];
 var totalLength;
 var pathString;
-var maxShapeHeight = 800;
-var maxShapeWidth = 1000;
+var maxShapeHeight = window.innerHeight * 0.8;
+var maxShapeWidth = window.innerWidth * 0.8;
 
 function setup() {
 	class Complex {
@@ -104,9 +104,9 @@ function setup() {
 		xEnlargement = maxShapeWidth/(maxX - minX);
 		yEnlargement = maxShapeHeight/(maxY - minY);
 		if (xEnlargement < yEnlargement) {
-			enlargementFactor = xEnlargement;
+			var enlargementFactor = xEnlargement;
 		} else {
-			enlargementFactor = yEnlargement;
+			var enlargementFactor = yEnlargement;
 		}
 		for (i = 0; i < initialXPoints.length; i++) {
 			points.push([ enlargementFactor * (initialXPoints[i] - xOffset), enlargementFactor * (initialYPoints[i] - yOffset) ]);
@@ -114,7 +114,7 @@ function setup() {
 
 		fourierSeries = FourierSeries_Gen(points, numberOfTerms);
 	}
-	req.open('GET', './resources/adarsh.svg', false);
+	req.open('GET', './resources/deer.svg', false);
 	req.send();
 	indexes = Index_Gen(numberOfTerms);
 	createCanvas(windowWidth, windowHeight);
