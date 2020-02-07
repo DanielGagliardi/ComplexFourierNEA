@@ -1,14 +1,21 @@
-var fourierSeries;
-var numberOfTerms = 1000;
-var indexes;
 var t = 0;
-var drawnLine = [];
 var timeIncrement = 0.001;
+
+var fourierSeries;
+var numberOfTerms = 500;
+var indexes;
+
+var drawnLine = [];
 var points = [];
 var totalLength;
 var pathString;
 var maxShapeHeight = window.innerHeight * 0.8;
 var maxShapeWidth = window.innerWidth * 0.8;
+
+var fade = 0;
+var fadeTimeRatio = 0.1;
+
+var shapeHue = 100 * Math.random();
 
 function setup() {
 	class Complex {
@@ -114,7 +121,7 @@ function setup() {
 
 		fourierSeries = FourierSeries_Gen(points, numberOfTerms);
 	}
-	req.open('GET', './resources/deer.svg', false);
+	req.open('GET', './resources/adarsh.svg', false);
 	req.send();
 	indexes = Index_Gen(numberOfTerms);
 	createCanvas(windowWidth, windowHeight);
@@ -125,6 +132,7 @@ function draw() {
 	background("black");
 	var x = 0;
 	var y = 0;
+
 	translate(windowWidth/2, windowHeight/2);
 	for (i = 0; i < numberOfTerms; i++) {
 		var oldx = x;
@@ -136,31 +144,42 @@ function draw() {
 		frequency = indexes[i];
 		x += radius * cos(frequency * t * TWO_PI + initialAngle);
 		y += radius * sin(frequency * t * TWO_PI + initialAngle);
-
+		
+		colorMode(RGB, 255);
 		noFill();
 		strokeWeight(1);
-		stroke(255,255,255,100);
+		stroke(255,255,255,100 * fade);
 		circle(oldx, oldy, radius * 2);
 
 		strokeWeight(1);
-		stroke(255,255,255,100);
+		stroke(255,255,255,100 * fade);
 		line(oldx, oldy, x, y);
 	}
-
-	drawnLine.push([x, y]);
-	/*
-	noFill();
-	beginShape();
-	stroke(0, 255, 0);
-	strokeWeight(1);
-	for (var i = 0; i < points.length; i++) {
-		vertex(points[i][0], points[i][1]);
+	
+	if (t <= fadeTimeRatio && fade <=1) {
+		fade += timeIncrement / fadeTimeRatio;
+	} else if (t < 2 - fadeTimeRatio) {
+		fade = 1;
+	} else if (t < 2) {
+		fade -= timeIncrement / fadeTimeRatio;
+	} else {
+		fade = 0;
+		t=0;
+		shapeHue = 100 * Math.random();
 	}
-	endShape();
-*/
+
+	if (t <= 1) {
+		drawnLine.push([x, y]);
+	} else if (t <= 2) {
+		drawnLine.shift();
+	} else {
+		//alert("next shape now")
+	}
+
 	noFill();
 	beginShape();
-	stroke(0, 255, 128);
+	colorMode(HSB, 100);
+	stroke(shapeHue, 100, 100, 100 * fade);
 	strokeWeight(2);
 	for (var i = 0; i < drawnLine.length; i++) {
 		vertex(drawnLine[i][0], drawnLine[i][1]);
