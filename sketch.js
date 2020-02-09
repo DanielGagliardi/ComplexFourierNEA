@@ -1,21 +1,24 @@
-var t = 0;
-var timeIncrement = 0.001;
+var shapeNames = ["deer","adarsh", "fourier", "pi", "sigma"];
+var shapeIndex = 0;
+
+var t;
+var timeIncrement = 0.0005;
 
 var fourierSeries;
+var req;
 var numberOfTerms = 500;
 var indexes;
 
 var drawnLine = [];
-var points = [];
 var totalLength;
 var pathString;
-var maxShapeHeight = window.innerHeight * 0.8;
-var maxShapeWidth = window.innerWidth * 0.8;
+var maxShapeHeight = window.innerHeight * 0.9;
+var maxShapeWidth = window.innerWidth * 0.9;
 
 var fade = 0;
 var fadeTimeRatio = 0.1;
 
-var shapeHue = 100 * Math.random();
+var shapeHue;
 
 function setup() {
 	class Complex {
@@ -87,8 +90,15 @@ function setup() {
 		return fourierSeries
 	}
 
-	var req = new XMLHttpRequest();
+	req = new XMLHttpRequest();
 	req.onload = function () {
+		//reseting variables
+		var points = [];
+		fade = 0;
+		t = 0;
+		shapeHue = 100 * Math.random();
+		drawnLine = [];
+
 		var text = this.responseText;
 		var parser = new DOMParser();
 		var svg = parser.parseFromString(text, "text/xml");
@@ -121,7 +131,7 @@ function setup() {
 
 		fourierSeries = FourierSeries_Gen(points, numberOfTerms);
 	}
-	req.open('GET', './resources/adarsh.svg', false);
+	req.open("GET", "./resources/".concat(shapeNames[shapeIndex],".svg"), false);
 	req.send();
 	indexes = Index_Gen(numberOfTerms);
 	createCanvas(windowWidth, windowHeight);
@@ -155,25 +165,11 @@ function draw() {
 		stroke(255,255,255,100 * fade);
 		line(oldx, oldy, x, y);
 	}
-	
-	if (t <= fadeTimeRatio && fade <=1) {
-		fade += timeIncrement / fadeTimeRatio;
-	} else if (t < 2 - fadeTimeRatio) {
-		fade = 1;
-	} else if (t < 2) {
-		fade -= timeIncrement / fadeTimeRatio;
-	} else {
-		fade = 0;
-		t=0;
-		shapeHue = 100 * Math.random();
-	}
 
 	if (t <= 1) {
 		drawnLine.push([x, y]);
 	} else if (t <= 2) {
 		drawnLine.shift();
-	} else {
-		//alert("next shape now")
 	}
 
 	noFill();
@@ -187,4 +183,17 @@ function draw() {
 	endShape();
 
 	t += timeIncrement;
+
+	if (t <= fadeTimeRatio && fade <=1) {
+		fade += timeIncrement / fadeTimeRatio;
+	} else if (t < 2 - fadeTimeRatio) {
+		fade = 1;
+	} else if (t <= 2 + timeIncrement * 2) {
+		fade -= timeIncrement / fadeTimeRatio;
+	} else {
+		//switch to new shape
+		shapeIndex = (shapeIndex + 1) % shapeNames.length;
+		req.open("GET", "./resources/".concat(shapeNames[shapeIndex],".svg"), false);
+		req.send();
+	}
 }
