@@ -1,12 +1,12 @@
-var shapeNames = ["deer","adarsh", "fourier", "pi", "sigma"];
+var shapeNames = ["deer", "adarsh","fourier", "pi", "sigma"];
 var shapeIndex = 0;
 
 var t;
-var timeIncrement = 0.0005;
+var timeIncrement = 0.001;
 
 var fourierSeries;
 var req;
-var numberOfTerms = 500;
+var numberOfTerms = 1000;
 var indexes;
 
 var drawnLine = [];
@@ -14,6 +14,9 @@ var totalLength;
 var pathString;
 var maxShapeHeight = window.innerHeight * 0.9;
 var maxShapeWidth = window.innerWidth * 0.9;
+var transX;
+var transY;
+
 
 var fade = 0;
 var fadeTimeRatio = 0.1;
@@ -135,7 +138,12 @@ function setup() {
 	req.send();
 	indexes = Index_Gen(numberOfTerms);
 	createCanvas(windowWidth, windowHeight);
+	transX = windowWidth/2;
+	transY = windowHeight/2;
+
+
 	background("black");
+	
 }
 
 function draw() {
@@ -143,7 +151,7 @@ function draw() {
 	var x = 0;
 	var y = 0;
 
-	translate(windowWidth/2, windowHeight/2);
+	translate(transX, transY);
 	for (i = 0; i < numberOfTerms; i++) {
 		var oldx = x;
 		var oldy = y;
