@@ -21,7 +21,7 @@ var transY;
 var fade = 0;
 var fadeTimeRatio = 0.1;
 
-var shapeHue;
+var shapeHue = Math.random() * 100;
 
 function setup() {
 	class Complex {
@@ -93,13 +93,16 @@ function setup() {
 		return fourierSeries
 	}
 
+	function Hue_Gen(oldHue) {
+		newHue = (oldHue + 10 + Math.random() * 80) % 100;
+	}
+
 	req = new XMLHttpRequest();
 	req.onload = function () {
 		//reseting variables
 		var points = [];
 		fade = 0;
 		t = 0;
-		shapeHue = 100 * Math.random();
 		drawnLine = [];
 
 		var text = this.responseText;
@@ -201,6 +204,7 @@ function draw() {
 	} else {
 		//switch to new shape
 		shapeIndex = (shapeIndex + 1) % shapeNames.length;
+		shapeHue = Hue_Gen(shapeHue);
 		req.open("GET", "./resources/".concat(shapeNames[shapeIndex],".svg"), false);
 		req.send();
 	}
