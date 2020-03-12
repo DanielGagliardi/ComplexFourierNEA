@@ -2,7 +2,7 @@ var shapeNames = ["deer", "adarsh","fourier", "pi", "sigma"];
 var shapeIndex = 0;
 
 var t;
-var timeIncrement = 0.0005;
+var timeIncrement = 0.001 ;
 
 var fourierSeries;
 var req;
@@ -94,7 +94,7 @@ function setup() {
 	}
 
 	function Hue_Gen(oldHue) {
-		newHue = (oldHue + 10 + Math.random() * 80) % 100;
+		return  (oldHue + 10 + Math.random() * 80) % 100;
 	}
 
 	req = new XMLHttpRequest();
@@ -103,6 +103,7 @@ function setup() {
 		var points = [];
 		fade = 0;
 		t = 0;
+		shapeHue = Hue_Gen(shapeHue);
 		drawnLine = [];
 
 		var text = this.responseText;
@@ -145,8 +146,7 @@ function setup() {
 	transY = windowHeight/2;
 
 
-	background("black");
-	
+	background("black");	
 }
 
 function draw() {
@@ -177,9 +177,9 @@ function draw() {
 		line(oldx, oldy, x, y);
 	}
 
-	if (t <= 1) {
+	if (t <= 1 + timeIncrement) {
 		drawnLine.push([x, y]);
-	} else if (t <= 2) {
+	} else if (2 <= t && t <= 3) {
 		drawnLine.shift();
 	}
 
@@ -197,14 +197,13 @@ function draw() {
 
 	if (t <= fadeTimeRatio && fade <=1) {
 		fade += timeIncrement / fadeTimeRatio;
-	} else if (t < 2 - fadeTimeRatio) {
+	} else if (t < 3 - fadeTimeRatio) {
 		fade = 1;
-	} else if (t <= 2 + timeIncrement * 2) {
+	} else if (t <= 3 + timeIncrement * 2) {
 		fade -= timeIncrement / fadeTimeRatio;
 	} else {
 		//switch to new shape
 		shapeIndex = (shapeIndex + 1) % shapeNames.length;
-		shapeHue = Hue_Gen(shapeHue);
 		req.open("GET", "./resources/".concat(shapeNames[shapeIndex],".svg"), false);
 		req.send();
 	}
