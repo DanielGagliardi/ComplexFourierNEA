@@ -1,5 +1,16 @@
+var database;
+var nameInput;
+var shapeInput;
+var submitButton;
 
-function setup {
+function setup() {
+	//createCanvas(windowWidth, windowHeight);
+	nameInput = createInput("Name");
+	shapeInput = createInput("PathString");
+	submitButton = createButton("Submit");
+	submitButton.mousePressed(submitShape);
+
+
 	var firebaseConfig = {
 		apiKey: "AIzaSyC_h5WroslBWC8y2isN_ORXkHJtEwm50To",
 		authDomain: "fourier-shapes-116aa.firebaseapp.com",
@@ -14,7 +25,23 @@ function setup {
 	// Initialize Firebase
 	firebase.initializeApp(firebaseConfig);
 	firebase.analytics();
-	
 	console.log(firebase);
+	database = firebase.database();
+
+	var ref = database.ref("shapes");
+
+	function submitShape() {
+		var data = {
+			name: nameInput.value(),
+			pathString: shapeInput.value()
+		};
+		console.log(data);
+		ref.push(data);
+	}
+
+
+
+
+
 }
 
