@@ -1,0 +1,47 @@
+@font-face {
+	font-family: 'Product Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Open Sans'), local('OpenSans'), url(https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwegdm0LZdjqr5-oayXSOefg.woff2) format('woff2');
+  }
+
+h1{
+	font-family: Product Sans;
+	color: #ffffff;
+	font-size: 100px;
+	margin: 10px;
+	padding: 20px;
+	text-align:center;
+}
+
+.button {
+	background-color:transparent;
+	border:3px solid #ffffff;
+	cursor:pointer;
+	color:#ffffff;
+	font-family: Product Sans;
+	font-size:40px;
+	width: 25%;
+	margin: 10px;
+	padding: 20px;
+	text-align:center;
+	transition: 0.5s;
+}
+.button:hover {
+	background-color:#01ff6b;
+}
+.button:active {
+	position:relative;
+	top:1px;
+}
+
+.flex-container {
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  }
+       
